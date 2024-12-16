@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import {View, StyleSheet, SafeAreaView, ScrollView, Text, Pressable, ActivityIndicator} from 'react-native';
+import React, {useEffect, useState} from 'react';
+import {ActivityIndicator, SafeAreaView, ScrollView, StyleSheet, View} from 'react-native';
 import AppColors from './constants/colors';
 import CustomText from "./components/CustomTextComponent";
 import Messages from "./constants/messages";
@@ -9,6 +9,18 @@ import VisionIcon from './assets/icons/vision.svg';
 import WeeklyForecasts from "./constants/weekly_forecasts";
 import {useFonts} from "expo-font";
 import * as Location from 'expo-location';
+
+const getCurrentDate = () => {
+    const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+    const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+
+    const currentDate = new Date();
+    const dayName = days[currentDate.getDay()];
+    const monthName = months[currentDate.getMonth()];
+    const dayOfMonth = currentDate.getDate();
+
+    return ` ${dayName}, ${dayOfMonth} ${monthName} `;
+};
 
 export default function App() {
 
@@ -29,6 +41,7 @@ export default function App() {
     const [address, setAddress] = useState<Location.LocationGeocodedAddress|null>(null);
     const [loading, setLoading] = useState<boolean>(true);
     const [errorMsg, setErrorMsg] = useState<string | null>(null);
+    const [currentDate, setCurrentDate] = useState(getCurrentDate());
 
     // Consolidate useEffects
     useEffect(() => {
@@ -62,7 +75,6 @@ export default function App() {
         fetchLocation();
     }, []);
 
-    // Early return if fonts are not loaded
     if (!loaded) {
         return null;
     }
@@ -78,7 +90,7 @@ export default function App() {
                 <View style={styles.textContainer}>
                     <CustomText fontWeight="Bold" fontSize={30} style={{paddingBottom:20}}>{address?.city}</CustomText>
                     <View style={styles.dateContainer}>
-                        <CustomText fontWeight={"Regular"} fontSize={14} fontColor={themeColor}> Friday, 20 January</CustomText>
+                        <CustomText fontWeight={"Regular"} fontSize={14} fontColor={themeColor}> {currentDate}</CustomText>
                     </View>
                     <CustomText fontWeight={"SemiBold"} fontSize={20} > Sunny </CustomText>
                     <View style={{flexDirection:"row"}}>
