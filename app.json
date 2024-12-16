@@ -1,8 +1,5 @@
 {
   "expo": {
-    "assetBundlePatterns": [
-      "**/*"
-    ],
     "name": "WeatherApp",
     "slug": "WeatherApp",
     "version": "1.0.0",
@@ -27,6 +24,9 @@
     "web": {
       "favicon": "./assets/favicon.png"
     },
+    "assetBundlePatterns": [
+      "**/*"
+    ],
     "plugins": [
       "expo-font"
     ]

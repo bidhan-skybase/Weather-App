@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import {View, StyleSheet, SafeAreaView, ScrollView, Text, Pressable} from 'react-native';
-import * as Font from 'expo-font';
 import AppColors from './constants/colors';
 import CustomText from "./components/CustomTextComponent";
 import Messages from "./constants/messages";
@@ -8,37 +7,41 @@ import AirIcon from './assets/icons/air.svg';
 import WaterIcon from './assets/icons/water.svg';
 import  VisionIcon from './assets/icons/vision.svg';
 import WeeklyForecasts from "./constants/weekly_forecasts";
+import {useFonts  } from "expo-font";
 
 export default function App() {
-    const [fontsLoaded, setFontsLoaded] = useState(false);
-    const loadFonts = async () => {
-        await Font.loadAsync({
-            'DMSans-Regular': require('./assets/fonts/DMSans-Regular.ttf'),
-            'DMSans-Bold': require('./assets/fonts/DMSans-Bold.ttf'),
-            'DMSans-Medium': require('./assets/fonts/DMSans-Medium.ttf'),
-            'DMSans-SemiBold': require('./assets/fonts/DMSans-SemiBold.ttf'),
-            'DMSans-ExtraBold': require('./assets/fonts/DMSans-ExtraBold.ttf'),
-        });
-    };
+
+    const [themeColor, setThemeColor] = useState(AppColors.yellowColor); // Default color
+
     useEffect(() => {
-        loadFonts()
-            .then(() => setFontsLoaded(true))
-            .catch(console.warn);
+        let colors = [AppColors.yellowColor, AppColors.blueColor, AppColors.pinkColor];
+        let randomColor = colors[Math.floor(Math.random() * colors.length)];
+        setThemeColor(randomColor);
     }, []);
 
-    if (!fontsLoaded) {
-        return <Text>Loading fonts...</Text>;
+    const [loaded]=useFonts(
+        {
+            'DMSans-Bold': require('./assets/fonts/DMSans-Bold.ttf'),
+            'DMSans-ExtraBold': require('./assets/fonts/DMSans-ExtraBold.ttf'),
+            'DMSans-Medium': require('./assets/fonts/DMSans-Medium.ttf'),
+            'DMSans-Regular': require('./assets/fonts/DMSans-Regular.ttf'),
+            'DMSans-SemiBold': require('./assets/fonts/DMSans-SemiBold.ttf'),
+        }
+    )
+    if(!loaded){
+        return null;
     }
 
+
     return (
-        <SafeAreaView style={styles.main}>
+        <SafeAreaView style={[styles.main,{backgroundColor:themeColor}]}>
             <ScrollView contentContainerStyle={styles.scrollViewContainer}>
                 <View style={styles.textContainer}>
                     <CustomText fontWeight="Bold" fontSize={30} style={{paddingBottom:20}}>Paris</CustomText>
                     <View style={
                         styles.dateContainer
                     }>
-                        <CustomText fontWeight={"Regular"} fontSize={14} fontColor={AppColors.yellowColor}> Friday, 20 January</CustomText>
+                        <CustomText fontWeight={"Regular"} fontSize={14} fontColor={themeColor}> Friday, 20 January</CustomText>
                     </View>
                     <CustomText fontWeight={"SemiBold"} fontSize={20} > Sunny </CustomText>
                     <View style={{flexDirection:"row"}}>
@@ -57,22 +60,22 @@ export default function App() {
                                 <AirIcon
                                     height={40}
                                     width={40}
-                                    fill={AppColors.yellowColor} > </AirIcon>
-                                <CustomText fontWeight={"Bold"} fontSize={16} fontColor={AppColors.yellowColor} style={{paddingTop:12}}>4km/h</CustomText>
-                                <CustomText fontWeight={"SemiBold"} fontSize={12}  fontColor={AppColors.yellowColor}>Wind</CustomText>
+                                    fill={themeColor} > </AirIcon>
+                                <CustomText fontWeight={"Bold"} fontSize={16} fontColor={themeColor} style={{paddingTop:12}}>4km/h</CustomText>
+                                <CustomText fontWeight={"SemiBold"} fontSize={12}  fontColor={themeColor}>Wind</CustomText>
                             </View>
                             <View style={{alignItems:"center"}}>
                                 <WaterIcon
                                     height={40}
                                     width={40}
-                                    fill={AppColors.yellowColor} > </WaterIcon>
-                                <CustomText fontWeight={"Bold"} fontSize={16} fontColor={AppColors.yellowColor }  style={{paddingTop:12}}>62%</CustomText>
-                                <CustomText fontWeight={"SemiBold"} fontSize={12}  fontColor={AppColors.yellowColor}>Humidity</CustomText>
+                                    fill={themeColor} > </WaterIcon>
+                                <CustomText fontWeight={"Bold"} fontSize={16} fontColor={themeColor }  style={{paddingTop:12}}>62%</CustomText>
+                                <CustomText fontWeight={"SemiBold"} fontSize={12}  fontColor={themeColor}>Humidity</CustomText>
                             </View>
                             <View style={{alignItems:"center"}}>
-                                <VisionIcon height={40} width={40} fill={AppColors.yellowColor}></VisionIcon>
-                                <CustomText fontWeight={"Bold"} fontSize={16} fontColor={AppColors.yellowColor} style={{paddingTop:12}}>1km</CustomText>
-                                <CustomText fontWeight={"SemiBold"} fontSize={12}  fontColor={AppColors.yellowColor}>Visibility</CustomText>
+                                <VisionIcon height={40} width={40} fill={themeColor}></VisionIcon>
+                                <CustomText fontWeight={"Bold"} fontSize={16} fontColor={themeColor} style={{paddingTop:12}}>1km</CustomText>
+                                <CustomText fontWeight={"SemiBold"} fontSize={12}  fontColor={themeColor}>Visibility</CustomText>
                             </View>
                         </View>
                     </View>
@@ -107,7 +110,7 @@ export default function App() {
 const styles = StyleSheet.create({
     main: {
         flex: 1,
-        backgroundColor: AppColors.yellowColor,
+
     },
     scrollViewContainer: {
         flexGrow: 1,
