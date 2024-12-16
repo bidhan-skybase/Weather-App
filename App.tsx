@@ -6,7 +6,7 @@ import Messages from "./constants/messages";
 import AirIcon from './assets/icons/air.svg';
 import WaterIcon from './assets/icons/water.svg';
 import VisionIcon from './assets/icons/vision.svg';
-import WeeklyForecasts from "./constants/weekly_forecasts";
+
 import {useFonts} from "expo-font";
 import * as Location from 'expo-location';
 import {WeatherModel} from "./WeatherModel";
@@ -25,6 +25,20 @@ const getCurrentDate = () => {
     return ` ${dayName}, ${dayOfMonth} ${monthName} `;
 };
 
+const formatDate = (datetime:any) => {
+    const months = [
+        'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
+        'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'
+    ];
+
+    // Parse the "yyyy-mm-dd" string
+    const date = new Date(datetime);
+
+    const day = date.getDate(); // Extract day (1-31)
+    const month = months[date.getMonth()]; // Extract month name using the index
+
+    return `${day} ${month}`;
+};
 
 
 export default function App() {
@@ -149,17 +163,18 @@ export default function App() {
                 <View>
                     <CustomText fontWeight={'SemiBold'} fontSize={20} style={{paddingBottom:10}}>Weekly forecast</CustomText>
                     <View style={{flexDirection:"row",justifyContent:"space-around"}}>
-                        {WeeklyForecasts.map((c, index) => (
+                        {weatherData?.days.map((c, index) => (
                             <View key={index} style={styles.weeklyContainer}>
                                 <CustomText fontSize={16} fontWeight={'Bold'} style={{ paddingBottom: 8 }}>
                                     {c.temp}°
                                 </CustomText>
-                                <c.icon width={40} height={40} fill={AppColors.textColor}/>
+                                {/* Uncomment this if needed: <c.icon width={40} height={40} fill={AppColors.textColor}/> */}
                                 <CustomText fontSize={12} fontWeight={'SemiBold'} style={{ paddingTop: 8 }}>
-                                    {c.date}
+                                    {formatDate(c.datetime)} {/* Format datetime */}
                                 </CustomText>
                             </View>
                         ))}
+
                     </View>
                 </View>
             </ScrollView>
