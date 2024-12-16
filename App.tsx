@@ -11,7 +11,7 @@ import {useFonts} from "expo-font";
 import * as Location from 'expo-location';
 
 export default function App() {
-    // Consolidate hooks at the top of the component
+
     const [loaded] = useFonts({
         'DMSans-Bold': require('./assets/fonts/DMSans-Bold.ttf'),
         'DMSans-ExtraBold': require('./assets/fonts/DMSans-ExtraBold.ttf'),
@@ -26,6 +26,7 @@ export default function App() {
     });
 
     const [location, setLocation] = useState<Location.LocationObject | null>(null);
+    const [address, setAddress] = useState<Location.LocationGeocodedAddress|null>(null);
     const [loading, setLoading] = useState<boolean>(true);
     const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
@@ -40,6 +41,16 @@ export default function App() {
                 }
 
                 let locationData = await Location.getCurrentPositionAsync({});
+                let address=await Location.reverseGeocodeAsync(
+                    {
+                        latitude:locationData.coords.latitude,
+                        longitude:locationData.coords.longitude,
+                    }
+                )
+                if (address.length > 0) {
+                    const currentAddress = address[0];
+                    setAddress(currentAddress);
+                }
                 setLocation(locationData);
             } catch (error) {
                 setErrorMsg('Error fetching location');
@@ -65,7 +76,7 @@ export default function App() {
         <SafeAreaView style={[styles.main,{backgroundColor:themeColor}]}>
             <ScrollView contentContainerStyle={styles.scrollViewContainer}>
                 <View style={styles.textContainer}>
-                    <CustomText fontWeight="Bold" fontSize={30} style={{paddingBottom:20}}>Paris</CustomText>
+                    <CustomText fontWeight="Bold" fontSize={30} style={{paddingBottom:20}}>{address?.city}</CustomText>
                     <View style={styles.dateContainer}>
                         <CustomText fontWeight={"Regular"} fontSize={14} fontColor={themeColor}> Friday, 20 January</CustomText>
                     </View>
@@ -75,7 +86,6 @@ export default function App() {
                         <CustomText fontSize={120}>°</CustomText>
                     </View>
                 </View>
-                <Text>text</Text>
                 <View style={{justifyContent:"flex-start",alignItems:"flex-start",paddingBottom:10}}>
                     <CustomText fontWeight={"SemiBold"} fontSize={20} style={{paddingBottom:8}}>Daily Summary</CustomText>
                     <CustomText style={{paddingBottom:8}}>
