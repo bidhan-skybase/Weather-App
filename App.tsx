@@ -9,6 +9,10 @@ import VisionIcon from './assets/icons/vision.svg';
 import WeeklyForecasts from "./constants/weekly_forecasts";
 import {useFonts} from "expo-font";
 import * as Location from 'expo-location';
+import {WeatherModel} from "./WeatherModel";
+import fetchCurrentWeather from "./fetchWeather";
+import axios from "axios";
+
 
 const getCurrentDate = () => {
     const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
@@ -18,12 +22,12 @@ const getCurrentDate = () => {
     const dayName = days[currentDate.getDay()];
     const monthName = months[currentDate.getMonth()];
     const dayOfMonth = currentDate.getDate();
-
     return ` ${dayName}, ${dayOfMonth} ${monthName} `;
 };
 
-export default function App() {
 
+
+export default function App() {
     const [loaded] = useFonts({
         'DMSans-Bold': require('./assets/fonts/DMSans-Bold.ttf'),
         'DMSans-ExtraBold': require('./assets/fonts/DMSans-ExtraBold.ttf'),
@@ -42,7 +46,26 @@ export default function App() {
     const [loading, setLoading] = useState<boolean>(true);
     const [errorMsg, setErrorMsg] = useState<string | null>(null);
     const [currentDate, setCurrentDate] = useState(getCurrentDate());
+    const [weatherData,setWeatherData]=useState<WeatherModel>();
 
+
+    const apiUrl: string = `https://weather.visualcrossing.com/VisualCrossingWebServices/rest/services/timeline/37.33%2C-122.032/2024-12-16/2024-12-20?unitGroup=metric&include=days&key=A6G98HA6NK8KXXMMYS266XXVF&contentType=json`;
+
+    const fetchWeather=async ()=>{
+   try{
+
+       const response=await axios.get(apiUrl);
+       const data=response.data;
+       setWeatherData(data);
+
+   }catch(e:any){
+       console.log(e.message);
+   }
+    }
+
+    useEffect(() => {
+        fetchWeather();
+    }, []);
     // Consolidate useEffects
     useEffect(() => {
         const fetchLocation = async () => {
@@ -92,32 +115,32 @@ export default function App() {
                     <View style={styles.dateContainer}>
                         <CustomText fontWeight={"Regular"} fontSize={14} fontColor={themeColor}> {currentDate}</CustomText>
                     </View>
-                    <CustomText fontWeight={"SemiBold"} fontSize={20} > Sunny </CustomText>
+                    <CustomText fontWeight={"SemiBold"} fontSize={20} > {weatherData?.days[0].conditions} </CustomText>
                     <View style={{flexDirection:"row"}}>
-                        <CustomText fontWeight={"Medium"} fontSize={200} >28</CustomText>
+                        <CustomText fontWeight={"Medium"} fontSize={200} >{weatherData?.days[0].temp}</CustomText>
                         <CustomText fontSize={120}>°</CustomText>
                     </View>
                 </View>
                 <View style={{justifyContent:"flex-start",alignItems:"flex-start",paddingBottom:10}}>
                     <CustomText fontWeight={"SemiBold"} fontSize={20} style={{paddingBottom:8}}>Daily Summary</CustomText>
                     <CustomText style={{paddingBottom:8}}>
-                        {Messages.lorem}
+                        {weatherData?.days[0].description}
                     </CustomText>
 
                     <View style={styles.statsContainer}>
                         <View style={{alignItems:"center"}}>
                             <AirIcon height={40} width={40} fill={themeColor} />
-                            <CustomText fontWeight={"Bold"} fontSize={16} fontColor={themeColor} style={{paddingTop:12}}>4km/h</CustomText>
+                            <CustomText fontWeight={"Bold"} fontSize={16} fontColor={themeColor} style={{paddingTop:12}}>{weatherData?.days[0].windspeed}km/h</CustomText>
                             <CustomText fontWeight={"SemiBold"} fontSize={12} fontColor={themeColor}>Wind</CustomText>
                         </View>
                         <View style={{alignItems:"center"}}>
                             <WaterIcon height={40} width={40} fill={themeColor} />
-                            <CustomText fontWeight={"Bold"} fontSize={16} fontColor={themeColor} style={{paddingTop:12}}>62%</CustomText>
+                            <CustomText fontWeight={"Bold"} fontSize={16} fontColor={themeColor} style={{paddingTop:12}}>{weatherData?.days[0].humidity}%</CustomText>
                             <CustomText fontWeight={"SemiBold"} fontSize={12} fontColor={themeColor}>Humidity</CustomText>
                         </View>
                         <View style={{alignItems:"center"}}>
                             <VisionIcon height={40} width={40} fill={themeColor} />
-                            <CustomText fontWeight={"Bold"} fontSize={16} fontColor={themeColor} style={{paddingTop:12}}>1km</CustomText>
+                            <CustomText fontWeight={"Bold"} fontSize={16} fontColor={themeColor} style={{paddingTop:12}}>{weatherData?.days[0].visibility}km</CustomText>
                             <CustomText fontWeight={"SemiBold"} fontSize={12} fontColor={themeColor}>Visibility</CustomText>
                         </View>
                     </View>
