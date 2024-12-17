@@ -10,34 +10,25 @@ import * as Location from 'expo-location';
 import {WeatherModel} from "./WeatherModel";
 import axios from "axios";
 import Cloudy from './assets/icons/partly_cloudy.svg';
+import Sun from './assets/icons/sun.svg';
 import Thunder from './assets/icons/thunder.svg';
 import Rainy from './assets/icons/rainy.svg';
 import Up from './assets/icons/up.svg';
 import Down from './assets/icons/down.svg';
+import Snow from './assets/icons/snow.svg';
+import Fog from './assets/icons/fog.svg';
 
-
-const WeatherIcon = (condition:string) => {
-    const iconMap = {
-        'sunny': Cloudy,
-        'cloudy': Cloudy,
-        'partly cloudy': Cloudy,
-        'thunder': Thunder,
-        'thunderstorm': Thunder,
-        'rainy': Rainy,
-        'rain': Rainy,
-        'shower': Rainy
-    };}
 
 const getCurrentDate = () => {
     const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
     const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
-
     const currentDate = new Date();
     const dayName = days[currentDate.getDay()];
     const monthName = months[currentDate.getMonth()];
     const dayOfMonth = currentDate.getDate();
     return ` ${dayName}, ${dayOfMonth} ${monthName} `;
 };
+
 
 const formatDate = (datetime:any) => {
     const months = [
@@ -64,10 +55,7 @@ export default function App() {
         'DMSans-SemiBold': require('./assets/fonts/DMSans-SemiBold.ttf'),
     });
 
-    const [themeColor, setThemeColor] = useState(() => {
-        const colors = [AppColors.yellowColor, AppColors.blueColor, AppColors.pinkColor];
-        return colors[Math.floor(Math.random() * colors.length)];
-    });
+
 
     const [location, setLocation] = useState<Location.LocationObject | null>(null);
     const [address, setAddress] = useState<Location.LocationGeocodedAddress|null>(null);
@@ -77,7 +65,7 @@ export default function App() {
     const [weatherData,setWeatherData]=useState<WeatherModel>();
 
 
-    const apiUrl: string = `https://weather.visualcrossing.com/VisualCrossingWebServices/rest/services/timeline/37.33%2C-122.032/2024-12-16/2024-12-20?unitGroup=metric&include=days&key=A6G98HA6NK8KXXMMYS266XXVF&contentType=json`;
+    const apiUrl: string = 'https://weather.visualcrossing.com/VisualCrossingWebServices/rest/services/timeline/27.222%2C83.999/2024-12-16/2024-12-20?unitGroup=metric&include=days&key=A6G98HA6NK8KXXMMYS266XXVF&contentType=json';
 
     const fetchWeather=async ()=>{
    try{
@@ -94,6 +82,32 @@ export default function App() {
     useEffect(() => {
         fetchWeather();
     }, []);
+
+
+    const getThemeColorByTemperature = (temperature:number) => {
+        if (temperature <= 5) {
+            return AppColors.cyanColor; // Chilly
+        } else if (temperature > 5 && temperature <= 15) {
+            return AppColors.blueColor; // Cold
+        } else if (temperature > 15 && temperature <= 20) {
+            return AppColors.lightOrange; // Cool
+        } else if (temperature > 20 && temperature <= 25) {
+            return AppColors.yellowColor; // Moderate
+        } else if (temperature > 25 && temperature <= 30) {
+            return AppColors.orangeColor; // Warm
+        } else if (temperature > 30 && temperature <= 35) {
+            return AppColors.pinkColor; // Hot
+        } else {
+            return AppColors.purpleColor; // Very Hot
+        }
+    };
+
+    const [themeColor, setThemeColor] = useState(() => {
+        const initialTemperature = weatherData?.days[0].temp||20;
+        return getThemeColorByTemperature(initialTemperature);
+    });
+
+
     // Consolidate useEffects
     useEffect(() => {
         const fetchLocation = async () => {
@@ -134,6 +148,13 @@ export default function App() {
     if (loading) {
         return <ActivityIndicator size="large" color="#0000ff" />;
     }
+    const logConditions = () => {
+        if (weatherData) {
+            weatherData.days.slice(1,5).forEach((day, index) => {
+                console.log(`Day ${index + 1} Conditions:`, day.conditions);
+            });
+        }
+    };
 
     return (
         <SafeAreaView style={[styles.main,{backgroundColor:themeColor}]}>
@@ -205,10 +226,23 @@ export default function App() {
                     <CustomText fontWeight={'SemiBold'} fontSize={20} style={{paddingBottom:10}}>Weekly forecast</CustomText>
                     <View style={{flexDirection:"row",justifyContent:"space-around"}}>
                         {weatherData?.days.slice(1,5).map((c, index) => (
+
                             <View key={index} style={styles.weeklyContainer}>
+
                                 <CustomText fontSize={16} fontWeight={'Bold'} style={{ paddingBottom: 8 }}>
                                     {c.temp}°
                                 </CustomText>
+                                {(() => {
+                                    const condition = c.conditions.toLowerCase();
+                                    return (
+                                        condition.includes('overcast') ? <Fog fill={'black'} /> :
+                                        condition.includes('rain') ? <Rainy fill={'black'} /> :
+                                            condition.includes('cloud') ? <Cloudy fill={'black'} /> :
+                                                condition.includes('clear') ? <Sun fill={'black'} /> :
+                                                    condition.includes('snow')?<Snow fill={'black'} /> :
+                                                    null
+                                    );
+                                })()}
 
                                 <CustomText fontSize={12} fontWeight={'SemiBold'} style={{ paddingTop: 8 }}>
                                     {formatDate(c.datetime)} {/* Format datetime */}
