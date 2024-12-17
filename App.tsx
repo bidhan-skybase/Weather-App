@@ -17,31 +17,7 @@ import Up from './assets/icons/up.svg';
 import Down from './assets/icons/down.svg';
 import Snow from './assets/icons/snow.svg';
 import Fog from './assets/icons/fog.svg';
-
-
-const getCurrentDate = () => {
-    const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
-    const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
-    const currentDate = new Date();
-    const dayName = days[currentDate.getDay()];
-    const monthName = months[currentDate.getMonth()];
-    const dayOfMonth = currentDate.getDate();
-    return ` ${dayName}, ${dayOfMonth} ${monthName} `;
-};
-
-
-const formatDate = (datetime:any) => {
-    const months = [
-        'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
-        'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'
-    ];
-    const date = new Date(datetime);
-
-    const day = date.getDate(); // Extract day (1-31)
-    const month = months[date.getMonth()]; // Extract month name using the index
-
-    return `${day} ${month}`;
-};
+import {formatDate, getCurrentDate} from "./utils/dateUtils";
 
 
 
