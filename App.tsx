@@ -1,18 +1,32 @@
 import React, {useEffect, useState} from 'react';
-import {ActivityIndicator, SafeAreaView, ScrollView, StyleSheet, View} from 'react-native';
+import {ActivityIndicator, SafeAreaView, ScrollView, StyleSheet, View,Text} from 'react-native';
 import AppColors from './constants/colors';
 import CustomText from "./components/CustomTextComponent";
-import Messages from "./constants/messages";
 import AirIcon from './assets/icons/air.svg';
 import WaterIcon from './assets/icons/water.svg';
 import VisionIcon from './assets/icons/vision.svg';
-
 import {useFonts} from "expo-font";
 import * as Location from 'expo-location';
 import {WeatherModel} from "./WeatherModel";
-import fetchCurrentWeather from "./fetchWeather";
 import axios from "axios";
+import Cloudy from './assets/icons/partly_cloudy.svg';
+import Thunder from './assets/icons/thunder.svg';
+import Rainy from './assets/icons/rainy.svg';
+import Up from './assets/icons/up.svg';
+import Down from './assets/icons/down.svg';
 
+
+const WeatherIcon = (condition:string) => {
+    const iconMap = {
+        'sunny': Cloudy,
+        'cloudy': Cloudy,
+        'partly cloudy': Cloudy,
+        'thunder': Thunder,
+        'thunderstorm': Thunder,
+        'rainy': Rainy,
+        'rain': Rainy,
+        'shower': Rainy
+    };}
 
 const getCurrentDate = () => {
     const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
@@ -30,8 +44,6 @@ const formatDate = (datetime:any) => {
         'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
         'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'
     ];
-
-    // Parse the "yyyy-mm-dd" string
     const date = new Date(datetime);
 
     const day = date.getDate(); // Extract day (1-31)
@@ -39,6 +51,8 @@ const formatDate = (datetime:any) => {
 
     return `${day} ${month}`;
 };
+
+
 
 
 export default function App() {
@@ -130,10 +144,37 @@ export default function App() {
                         <CustomText fontWeight={"Regular"} fontSize={14} fontColor={themeColor}> {currentDate}</CustomText>
                     </View>
                     <CustomText fontWeight={"SemiBold"} fontSize={20} > {weatherData?.days[0].conditions} </CustomText>
-                    <View style={{flexDirection:"row"}}>
-                        <CustomText fontWeight={"Medium"} fontSize={200} >{weatherData?.days[0].temp}</CustomText>
-                        <CustomText fontSize={120}>°</CustomText>
-                    </View>
+                </View>
+                <View style={{flexDirection:"row",alignItems:"center",justifyContent:"flex-end"}}>
+                    <Up fill={"black"}></Up>
+                    <CustomText fontWeight={"Medium"}>{weatherData?.days[0].tempmax}°</CustomText>
+                </View>
+                <View style={{flexDirection:"row",alignItems:"flex-start",justifyContent:"center"}}>
+                  <Text style={{
+                      fontSize: 190,
+                      includeFontPadding: false,
+                      textAlignVertical: "bottom",
+                      lineHeight: 200,
+                      fontFamily:"DMSans-Medium",
+                      bottom: -40
+                  }}>{weatherData?.days[0].temp}</Text>
+                    <Text
+                        style={{
+                            fontSize: 120,
+                            fontWeight: "300",
+                            includeFontPadding: false,
+                            textAlignVertical: "top",
+                            lineHeight: 120,
+                            paddingLeft: 0,
+                            margin: 0
+                        }}
+                    >
+                        °
+                    </Text>
+                </View>
+                <View style={{flexDirection:"row",alignItems:"center",justifyContent:"flex-start",paddingBottom:8}}>
+                    <Down fill={"black"} ></Down>
+                    <CustomText fontWeight={"Medium"}> {weatherData?.days[0].tempmin}°</CustomText>
                 </View>
                 <View style={{justifyContent:"flex-start",alignItems:"flex-start",paddingBottom:10}}>
                     <CustomText fontWeight={"SemiBold"} fontSize={20} style={{paddingBottom:8}}>Daily Summary</CustomText>
@@ -163,12 +204,12 @@ export default function App() {
                 <View>
                     <CustomText fontWeight={'SemiBold'} fontSize={20} style={{paddingBottom:10}}>Weekly forecast</CustomText>
                     <View style={{flexDirection:"row",justifyContent:"space-around"}}>
-                        {weatherData?.days.map((c, index) => (
+                        {weatherData?.days.slice(1,5).map((c, index) => (
                             <View key={index} style={styles.weeklyContainer}>
                                 <CustomText fontSize={16} fontWeight={'Bold'} style={{ paddingBottom: 8 }}>
                                     {c.temp}°
                                 </CustomText>
-                                {/* Uncomment this if needed: <c.icon width={40} height={40} fill={AppColors.textColor}/> */}
+
                                 <CustomText fontSize={12} fontWeight={'SemiBold'} style={{ paddingTop: 8 }}>
                                     {formatDate(c.datetime)} {/* Format datetime */}
                                 </CustomText>
